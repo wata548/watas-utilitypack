@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "displayName": "Wata's Utility pack",
   "description": "Wata's utility pack(Csv, test editor, language compatible ui, selectable UI)",
-  "unity": "6.2",
+  "unity": "6000.2",
   "dependencies": {
-    "com.unity.textmeshpro": "3.0.6"
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.nuget.newtonsoft-json": "2.0.0"
   },
   "keywords": [],
   "author": {

@@ -1,0 +1,16 @@
+{
+    "name": "UtilityPack.Code.Editor",
+    "rootNamespace": "",
+    "references": [
+        "UtilityPack.Code.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

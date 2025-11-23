@@ -1,0 +1,22 @@
+{
+  "name": "com.wata.UtilityPack",
+  "version": "0.1.0",
+  "displayName": "Wata's Utility pack",
+  "description": "Wata's utility pack(Csv, test editor, language compatible ui, selectable UI)",
+  "unity": "6.2",
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Wata",
+    "email": "watashimokia@gmail.com"
+  },
+  "samples": [
+    {
+      "displayName": "intermediate samples",
+      "description": "show selectable ui, lang",
+      "path": "Samples~/Scenes"
+    }
+  ]
+}

@@ -3,5 +3,18 @@ namespace Lang {
         English,
         Korean,
         Japanese,
+        Chinese, 
+        French,
+        Hindi,
+        Spanish,
+        Arabic,
+        Bengali,
+        Portuguese,
+        Russian,
+        Indonesian,
+        Urdu,
+        German,
+        Turkish,
+        Thai,
     }
 }

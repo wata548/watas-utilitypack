@@ -1,3 +1,4 @@
+using Extension.Test;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +30,11 @@ namespace Lang {
        protected virtual void Refresh() {
            _text.text = _context.ApplyLang();
        }
+
+       [TestMethod]
+       private void Change(string pContext) {
+           text = pContext;
+       }  
        
        //==================================================||Unity 
         private void OnBecameVisible() {

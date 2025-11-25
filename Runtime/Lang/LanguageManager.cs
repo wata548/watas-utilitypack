@@ -31,6 +31,8 @@ namespace Lang {
         public static Language LangPack {
             get => _langPack;
             set {
+                if(_langPack == value)
+                    return;
                 _langPack = value;
                 NeedUpdateFrame = Time.frameCount + 1;
                 Debug.Log($"Changed: {_langPack}");

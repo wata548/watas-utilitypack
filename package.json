@@ -17,7 +17,7 @@
     {
       "displayName": "intermediate samples",
       "description": "show selectable ui, lang",
-      "path": "Samples~/Scenes"
+      "path": "Samples~"
     }
   ]
 }

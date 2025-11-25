@@ -1,13 +1,20 @@
 using Extension.Test;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace Lang {
     
     [RequireComponent(typeof(TMP_Text))]
-    public class TMP_LangText: MonoBehaviour { 
-        
+    public class TMP_LangText: MonoBehaviour {
+
+        public static Dictionary<Language, TMP_FontAsset> Fonts { private get; set; }
+        private static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
+            if (Fonts.TryGetValue(pLanguage, out var font))
+                return font;
+            return Fonts[pMainLanguage];
+        }
+            
         //==================================================||Fields
         private TMP_Text _text;
         private string _context;
@@ -29,6 +36,7 @@ namespace Lang {
        //==================================================||Methods 
        protected virtual void Refresh() {
            _text.text = _context.ApplyLang();
+           _text.font = GetFont(LanguageManager.LangPack, LanguageManager.MainLang);
        }
 
        [TestMethod]

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using CSVData;
 
@@ -54,5 +53,7 @@ namespace Lang {
             return pContext;
         }
 
+        public IEnumerable<Language> AllowLanguages() => 
+            _allowLanguages;
     }
 }

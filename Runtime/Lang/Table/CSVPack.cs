@@ -12,6 +12,7 @@ namespace Lang {
         private List<Language> _allowLanguages = new();
         
         //==================================================||Constructors 
+        public CSVPack(){}
         public CSVPack(string pPath): this(File.ReadAllText(pPath), LanguageManager.MainLang) { }
         public CSVPack(string pContext, Language pMainLanguage): this(CSV.Parse(pContext), pMainLanguage) {}
         public CSVPack(List<List<string>> pContext, Language pMainLanguage) =>

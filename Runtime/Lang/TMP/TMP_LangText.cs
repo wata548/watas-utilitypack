@@ -12,7 +12,9 @@ namespace Lang {
         private static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
             if (Fonts.TryGetValue(pLanguage, out var font))
                 return font;
-            return Fonts[pMainLanguage];
+            if (Fonts.TryGetValue(pMainLanguage, out font))
+                return font;
+            return null;
         }
             
         //==================================================||Fields
@@ -36,7 +38,9 @@ namespace Lang {
        //==================================================||Methods 
        protected virtual void Refresh() {
            _text.text = _context.ApplyLang();
-           _text.font = GetFont(LanguageManager.LangPack, LanguageManager.MainLang);
+           var font = GetFont(LanguageManager.LangPack, LanguageManager.MainLang);
+           if (font != null)
+               _text.font = font;
        }
 
        [TestMethod]

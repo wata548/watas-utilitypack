@@ -8,11 +8,17 @@ namespace Lang {
     [RequireComponent(typeof(TMP_Text))]
     public class TMP_LangText: MonoBehaviour {
 
-        public static Dictionary<Language, TMP_FontAsset> Fonts { private get; set; }
+       //==================================================||Statics 
+        private static Dictionary<Language, TMP_FontAsset> _fonts;
+
+        public static void SetFont(Language pLanguage, TMP_FontAsset pFont) {
+            if (!_fonts.TryAdd(pLanguage, pFont))
+                _fonts[pLanguage] = pFont;
+        }
         private static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
-            if (Fonts.TryGetValue(pLanguage, out var font))
+            if (_fonts.TryGetValue(pLanguage, out var font))
                 return font;
-            if (Fonts.TryGetValue(pMainLanguage, out font))
+            if (_fonts.TryGetValue(pMainLanguage, out font))
                 return font;
             return null;
         }

@@ -9,7 +9,7 @@ namespace Lang {
     public class TMP_LangText: MonoBehaviour {
 
        //==================================================||Statics 
-        private static Dictionary<Language, TMP_FontAsset> _fonts;
+        private static Dictionary<Language, TMP_FontAsset> _fonts = new();
 
         public static void SetFont(Language pLanguage, TMP_FontAsset pFont) {
             if (!_fonts.TryAdd(pLanguage, pFont))

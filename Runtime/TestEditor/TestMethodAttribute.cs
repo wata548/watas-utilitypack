@@ -10,12 +10,13 @@ namespace Extension.Test {
         public readonly int Priority;
         public readonly string Name;
         public readonly bool RuntimeOnly;
+        public readonly bool AllowFoldOut;
 
-        public TestMethodAttribute(int pPriority, string pName = "", bool pRuntimeOnly = false) =>
-            (Name, Priority, RuntimeOnly) = (pName, pPriority, pRuntimeOnly);
+        public TestMethodAttribute(int pPriority, string pName = "", bool pRuntimeOnly = false, bool pAllowFoldOut = true) =>
+            (Name, Priority, RuntimeOnly, AllowFoldOut) = (pName, pPriority, pRuntimeOnly, pAllowFoldOut);
         
-        public TestMethodAttribute(string pName = "", int pPriority = 0, bool pRuntimeOnly = false) =>
-            (Name, Priority, RuntimeOnly) = (pName, pPriority, pRuntimeOnly);
+        public TestMethodAttribute(string pName = "", int pPriority = 0, bool pRuntimeOnly = false, bool pAllowFoldOut = true) =>
+            (Name, Priority, RuntimeOnly, AllowFoldOut) = (pName, pPriority, pRuntimeOnly, pAllowFoldOut);
         
     }
 

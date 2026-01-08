@@ -16,8 +16,8 @@ namespace Extension.Test {
         
         public static IEnumerable<(MethodInfo Method, T Attribute)> HaveAttributeMethods<T>(this Type pType, BindingFlags pFlag, IEqualityComparer<(MethodInfo, T)> pComparer)
             where T: Attribute => pType
-            .GetSuperTypes()
-            .SelectMany(type => type.HaveAttributeMethods<T>(pFlag))
-            .Distinct(pComparer);
+                .GetSuperTypes()
+                .SelectMany(type => type.HaveAttributeMethods<T>(pFlag))
+                .Distinct(pComparer);
     }
 }

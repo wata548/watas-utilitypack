@@ -60,8 +60,11 @@ namespace Lang {
             Refresh();
         }
 
-        private void Start() {
+        private void Awake() {
             _text = GetComponent<TMP_Text>();
+        }
+        
+        private void Start() {
             _context = _text.text;
         }
         

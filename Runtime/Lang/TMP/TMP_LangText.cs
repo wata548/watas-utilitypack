@@ -28,6 +28,7 @@ namespace Lang {
         private string _context;
         
        //==================================================||Properties 
+        public TMP_Text Tmp => _text;
         public string Text {
             get => text;
             set => text = value;

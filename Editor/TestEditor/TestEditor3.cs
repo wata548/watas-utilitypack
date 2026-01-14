@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Extension.Test {
     
     [CustomEditor(typeof(ScriptableObject), true)]
-    public class TestEditor3: TestEditor {}
+    public class TestEditor3: TestEditor2 {}
 }
+
 #endif

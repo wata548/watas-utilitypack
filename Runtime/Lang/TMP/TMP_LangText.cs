@@ -28,6 +28,7 @@ namespace Lang {
         private string _context;
         
        //==================================================||Properties 
+        public TMP_Text Tmp => _text;
         public string Text {
             get => text;
             set => text = value;
@@ -59,8 +60,11 @@ namespace Lang {
             Refresh();
         }
 
-        private void Start() {
+        private void Awake() {
             _text = GetComponent<TMP_Text>();
+        }
+        
+        private void Start() {
             _context = _text.text;
         }
         

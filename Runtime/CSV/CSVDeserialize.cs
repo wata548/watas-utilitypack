@@ -27,13 +27,6 @@ namespace CSVData {
                                         | BindingFlags.Public
                                         | BindingFlags.FlattenHierarchy;
             
-            bool isAllowedInput = 
-                headerNames.Count == values.Count;
-
-            if (!isAllowedInput)
-                throw new ArgumentException($"This parameter isn't allowed, please match parameter's size equal.\n"
-                                            + $"Names: {headerNames.Count}, Values: {values.Count}");
-
             var result = Activator.CreateInstance(targetType);
 
             for (int i = 0; i < headerNames.Count; i++) {

@@ -118,7 +118,7 @@ namespace CSVData {
             var addFunction = listType.GetMethod("Add", new Type[] { targetType })!;
             
             for (int i = 2; i < datas.Count; i++) {
-                if (datas.All(cell => string.IsNullOrWhiteSpace(cell)))
+                if (datas[i].All(cell => string.IsNullOrWhiteSpace(cell)))
                     break;
                 var row = Deserialize(targetType, headerNames, datas[i], ignoreSomeError);
                 addFunction.Invoke(list, new[] {row});

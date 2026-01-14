@@ -111,7 +111,7 @@ namespace CSVData {
                 return null;
             }
             
-            var headerNames = datas[0];
+            var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
 
             var listType = typeof(List<>).MakeGenericType(targetType);
             
@@ -243,7 +243,7 @@ namespace CSVData {
             else
                 keyType = (primaryKeyInfo as FieldInfo)!.FieldType;
             
-            var headerNames = datas[0];
+            var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
             var dictionaryType = 
                 typeof(Dictionary<,>).MakeGenericType(keyType, targetType);
             var result = Activator.CreateInstance(dictionaryType);

@@ -4,20 +4,42 @@ using System.Linq;
 using System.Reflection;
 
 namespace Extension.Test {
-    public static class ExAttribute {
+    
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class TestMethodAttribute: Attribute {
+        public readonly int Priority;
+        public readonly string Name;
+        public readonly bool RuntimeOnly;
+        public readonly bool AllowFoldOut;
+
+        public TestMethodAttribute(int pPriority, string pName = "", bool pRuntimeOnly = false, bool pAllowFoldOut = true) =>
+            (Name, Priority, RuntimeOnly, AllowFoldOut) = (pName, pPriority, pRuntimeOnly, pAllowFoldOut);
         
-        public static IEnumerable<(MethodInfo Method, T Attribute)> HaveAttributeMethods<T>(this Type pType, BindingFlags pFlag)
-            where T: Attribute => pType?.GetMethods(pFlag)
-                .Where(method => method.IsDefined(typeof(T)))
-                .Select(method => (
-                    method,
-                    method.GetCustomAttribute(typeof(T)) as T
-                ));
+        public TestMethodAttribute(string pName = "", int pPriority = 0, bool pRuntimeOnly = false, bool pAllowFoldOut = true) =>
+            (Name, Priority, RuntimeOnly, AllowFoldOut) = (pName, pPriority, pRuntimeOnly, pAllowFoldOut);
         
-        public static IEnumerable<(MethodInfo Method, T Attribute)> HaveAttributeMethods<T>(this Type pType, BindingFlags pFlag, IEqualityComparer<(MethodInfo, T)> pComparer)
-            where T: Attribute => pType
-                .GetSuperTypes()
-                .SelectMany(type => type.HaveAttributeMethods<T>(pFlag))
-                .Distinct(pComparer);
+    }
+
+    public class MethodComparer<T> : IEqualityComparer<(MethodInfo, T)> {
+        public bool Equals((MethodInfo, T) x, (MethodInfo, T) y) {
+            return x.Item1.Name == y.Item1.Name
+                   && x.Item1.ReturnType == y.Item1.ReturnType
+                   && x.Item1.GetParameters().Select(p => p.ParameterType)
+                       .SequenceEqual(y.Item1.GetParameters().Select(p => p.ParameterType));
+        }
+
+        public int GetHashCode((MethodInfo, T) pObj) {
+
+            var parameters = pObj.Item1.GetParameters();
+            
+            if(parameters.Length == 0)
+                return HashCode.Combine(pObj.Item1.Name, pObj.Item1.ReturnType);
+            
+            var hash = pObj.Item1.GetParameters()
+                .Select(p => p.ParameterType.GetHashCode())
+                .Aggregate((lhs, rhs) => (lhs * 123) ^ rhs);
+            
+            return HashCode.Combine(pObj.Item1.Name, pObj.Item1.ReturnType, hash);
+        }
     }
 }

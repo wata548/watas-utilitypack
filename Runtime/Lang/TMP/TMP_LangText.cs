@@ -56,16 +56,13 @@ namespace Lang {
        }  
        
        //==================================================||Unity 
-        private void OnBecameVisible() {
-            Refresh();
-        }
-
         private void Awake() {
             _text = GetComponent<TMP_Text>();
         }
         
         private void Start() {
             _context = _text.text;
+            Refresh();
         }
         
         private void Update() {

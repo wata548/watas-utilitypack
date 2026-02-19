@@ -15,7 +15,7 @@ namespace Lang {
             if (!_fonts.TryAdd(pLanguage, pFont))
                 _fonts[pLanguage] = pFont;
         }
-        private static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
+        public static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
             if (_fonts.TryGetValue(pLanguage, out var font))
                 return font;
             if (_fonts.TryGetValue(pMainLanguage, out font))

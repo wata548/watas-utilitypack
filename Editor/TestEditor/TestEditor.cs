@@ -21,21 +21,24 @@ namespace Extension.Test {
             var targetType = (target as MonoScript)!.GetClass();
             if (targetType == null)
                 return;
-            
+
             var targets = targetType
                 .HaveAttributeMethods(flag, new MethodComparer<TestMethodAttribute>())
-                .OrderByDescending(data => data.Item2.Priority);
+                .OrderBy(data => data.Attribute.AllowFoldOut)
+                .ThenByDescending(data => data.Item2.Priority);
 
             if (!targets.Any())
                 return;
-            
-            _isFoldOut = EditorGUILayout.BeginFoldoutHeaderGroup(_isFoldOut, "TestFunction");
-            if (!_isFoldOut)
-                return;
 
-            
+            bool generatedFoldOut = false;
             foreach (var targetButton in targets) {
-
+                if (!generatedFoldOut && targetButton.Attribute.AllowFoldOut) {
+                    generatedFoldOut = true;
+                    _isFoldOut = EditorGUILayout.BeginFoldoutHeaderGroup(_isFoldOut, "TestFunction");
+                    if (!_isFoldOut)
+                        return;
+                }
+                
                 SetPropertyField(targetButton.Method);
 
                 var buttonName = targetButton.Attribute.Name;
@@ -56,7 +59,8 @@ namespace Extension.Test {
                     EditorGUI.EndDisabledGroup();
 
             }
-            EditorGUILayout.EndFoldoutHeaderGroup();
+            if(generatedFoldOut)
+                EditorGUILayout.EndFoldoutHeaderGroup();
         }
 
     }

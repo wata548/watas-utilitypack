@@ -19,26 +19,25 @@ namespace Extension.Test {
                        | BindingFlags.Public
                        | BindingFlags.NonPublic;
             
-            //Find functions
             var targets = target.GetType()
                 .HaveAttributeMethods(flag, new MethodComparer<TestMethodAttribute>())
-                .OrderByDescending(data => data.Attribute.Priority);
+                .OrderBy(data => data.Attribute.AllowFoldOut)
+                .ThenByDescending(data => data.Attribute.Priority);
 
-            //If it didn't have attribute Field, reutrn;
             if (!targets.Any())
                 return;
             
-            //Show foldOut
-            _isFoldOut = EditorGUILayout.BeginFoldoutHeaderGroup(_isFoldOut, "TestFunction");
-            if (!_isFoldOut)
-                return;
-            
-            //Show button
+            bool generatedFoldOut = false;
             foreach (var targetButton in targets) {
+                if (!generatedFoldOut && targetButton.Attribute.AllowFoldOut) {
+                    generatedFoldOut = true;
+                    _isFoldOut = EditorGUILayout.BeginFoldoutHeaderGroup(_isFoldOut, "TestFunction");
+                    if (!_isFoldOut)
+                        return;
+                }
 
                 SetPropertyField(targetButton.Method);
 
-                //set button name
                 var buttonName = targetButton.Attribute.Name;
                 if (string.IsNullOrEmpty(buttonName))
                     buttonName = targetButton.Method.Name;
@@ -49,7 +48,6 @@ namespace Extension.Test {
                     buttonName += "(RuntimeOnly)";
                 }
                 
-                //button plate
                 if (GUILayout.Button(buttonName)) {
 
                     var parameterList = GetParameterValue(targetButton.Method);
@@ -64,7 +62,8 @@ namespace Extension.Test {
                     EditorGUI.EndDisabledGroup();
 
             }
-            EditorGUILayout.EndFoldoutHeaderGroup();
+            if(generatedFoldOut)
+                EditorGUILayout.EndFoldoutHeaderGroup();
         }
     }
 }

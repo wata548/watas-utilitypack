@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -26,13 +27,6 @@ namespace CSVData {
                                         | BindingFlags.Public
                                         | BindingFlags.FlattenHierarchy;
             
-            bool isAllowedInput = 
-                headerNames.Count == values.Count;
-
-            if (!isAllowedInput)
-                throw new ArgumentException($"This parameter isn't allowed, please match parameter's size equal.\n"
-                                            + $"Names: {headerNames.Count}, Values: {values.Count}");
-
             var result = Activator.CreateInstance(targetType);
 
             for (int i = 0; i < headerNames.Count; i++) {
@@ -110,7 +104,7 @@ namespace CSVData {
                 return null;
             }
             
-            var headerNames = datas[0];
+            var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
 
             var listType = typeof(List<>).MakeGenericType(targetType);
             
@@ -118,6 +112,8 @@ namespace CSVData {
             var addFunction = listType.GetMethod("Add", new Type[] { targetType })!;
             
             for (int i = 2; i < datas.Count; i++) {
+                if (datas[i].All(cell => string.IsNullOrWhiteSpace(cell)))
+                    break;
                 var row = Deserialize(targetType, headerNames, datas[i], ignoreSomeError);
                 addFunction.Invoke(list, new[] {row});
             }
@@ -240,7 +236,7 @@ namespace CSVData {
             else
                 keyType = (primaryKeyInfo as FieldInfo)!.FieldType;
             
-            var headerNames = datas[0];
+            var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
             var dictionaryType = 
                 typeof(Dictionary<,>).MakeGenericType(keyType, targetType);
             var result = Activator.CreateInstance(dictionaryType);

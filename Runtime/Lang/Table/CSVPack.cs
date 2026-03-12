@@ -20,7 +20,8 @@ namespace Lang {
             Add(CSV.Parse(pContext));
 
         public void Add(List<List<string>> pContext) {
-            var packs = pContext.Select(row => ((Language)Enum.Parse(typeof(Language), row[0]), row.Skip(1)));
+            var packs = pContext.Where(row => !string.IsNullOrWhiteSpace(row[0]))
+                .Select(row => ((Language)Enum.Parse(typeof(Language), row[0]), row.Skip(1)));
             if (packs.All(pack => pack.Item1 != _mainLanguage))
                 return;
 

@@ -42,6 +42,6 @@ namespace Lang {
        //==================================================||Methods 
 
         public static string ApplyLang(this string pContext) =>
-            _table.Text(LangPack, pContext);
+            _table?.Text(LangPack, pContext) ?? pContext;
     }
 }

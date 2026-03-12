@@ -15,7 +15,7 @@ namespace Lang {
             if (!_fonts.TryAdd(pLanguage, pFont))
                 _fonts[pLanguage] = pFont;
         }
-        private static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
+        public static TMP_FontAsset GetFont(Language pLanguage, Language pMainLanguage = Language.English) {
             if (_fonts.TryGetValue(pLanguage, out var font))
                 return font;
             if (_fonts.TryGetValue(pMainLanguage, out font))
@@ -28,6 +28,7 @@ namespace Lang {
         private string _context;
         
        //==================================================||Properties 
+        public TMP_Text Tmp => _text;
         public string Text {
             get => text;
             set => text = value;
@@ -55,13 +56,13 @@ namespace Lang {
        }  
        
        //==================================================||Unity 
-        private void OnBecameVisible() {
-            Refresh();
-        }
-
-        private void Start() {
+        private void Awake() {
             _text = GetComponent<TMP_Text>();
+        }
+        
+        private void Start() {
             _context = _text.text;
+            Refresh();
         }
         
         private void Update() {

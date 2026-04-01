@@ -26,6 +26,7 @@ namespace Lang {
         //==================================================||Fields
         private TMP_Text _text;
         private string _context;
+        private bool _needUpdate = false;
         
        //==================================================||Properties 
         public TMP_Text Tmp => _text;
@@ -57,10 +58,8 @@ namespace Lang {
        
        //==================================================||Unity 
        private void OnEnable() {
-            if (_text == null)
-                return;
-            Refresh();
-        }
+           _needUpdate = true;
+       }
         private void Awake() {
             _text = GetComponent<TMP_Text>();
         }
@@ -73,6 +72,10 @@ namespace Lang {
         private void Update() {
             if(Time.frameCount == LanguageManager.NeedUpdateFrame)
                 Refresh();
+            if (_needUpdate) {
+                _needUpdate = false;
+                Refresh();
+            }
         }
     }
 }

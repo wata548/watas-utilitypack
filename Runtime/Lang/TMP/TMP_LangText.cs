@@ -56,6 +56,11 @@ namespace Lang {
        }  
        
        //==================================================||Unity 
+       private void OnEnable() {
+            if (_text == null)
+                return;
+            Refresh();
+        }
         private void Awake() {
             _text = GetComponent<TMP_Text>();
         }

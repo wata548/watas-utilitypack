@@ -20,11 +20,11 @@ namespace CSVData {
         private static void Init() {
             var window = GetWindow<CSVWindow>("CSV Title");
             window.Show();
-            if(String.IsNullOrEmpty(EditorPrefs.GetString("CSV_EnvPath")))
-                EditorPrefs.SetString("CSV_EnvPath", ".env");
-            if(String.IsNullOrEmpty(EditorPrefs.GetString("CSV_SavePath")))
-                EditorPrefs.SetString("CSV_SavePath", "Resources");
-            window._targetSheet = EditorPrefs.GetString("CSV_TargetSheet")
+            if(String.IsNullOrEmpty(EditorUserSettings.GetConfigValue("CSV_EnvPath")))
+                EditorUserSettings.SetConfigValue("CSV_EnvPath", ".env");
+            if(String.IsNullOrEmpty(EditorUserSettings.GetConfigValue("CSV_SavePath")))
+                EditorUserSettings.SetConfigValue("CSV_SavePath", "Resources");
+            window._targetSheet = EditorUserSettings.GetConfigValue("CSV_TargetSheet")
                 .Split(',')
                 .ToList();
         }
@@ -35,10 +35,10 @@ namespace CSVData {
         }
 
         private void Load(bool pGenerateCode = false) {
-            var envPath = Path.Combine(Application.dataPath, EditorPrefs.GetString("CSV_EnvPath"));
+            var envPath = Path.Combine(Application.dataPath, EditorUserSettings.GetConfigValue("CSV_EnvPath"));
             var ssKey = File.ReadAllText(envPath);
-            var ssPath = EditorPrefs.GetString("CSV_SheetId");
-            var savePath = Path.Combine(Application.dataPath, EditorPrefs.GetString("CSV_SavePath"));
+            var ssPath = EditorUserSettings.GetConfigValue("CSV_SheetId");
+            var savePath = Path.Combine(Application.dataPath, EditorUserSettings.GetConfigValue("CSV_SavePath"));
             foreach (var sheet in _targetSheet) {
                 if(string.IsNullOrWhiteSpace(sheet))
                     continue;
@@ -53,16 +53,16 @@ namespace CSVData {
         }
 
         private void GenerateEnum() {
-            var envPath = Path.Combine(Application.dataPath, EditorPrefs.GetString("CSV_EnvPath"));
+            var envPath = Path.Combine(Application.dataPath, EditorUserSettings.GetConfigValue("CSV_EnvPath"));
             var ssKey = File.ReadAllText(envPath);
-            var ssPath = EditorPrefs.GetString("CSV_SheetId");
-            var data = SpreadSheet.LoadData(ssPath, EditorPrefs.GetString("CSV_TypeSheet"), ssKey);
+            var ssPath = EditorUserSettings.GetConfigValue("CSV_SheetId");
+            var data = SpreadSheet.LoadData(ssPath, EditorUserSettings.GetConfigValue("CSV_TypeSheet"), ssKey);
             CSV.GenerateCode("Enums", data, CSVDataStyle.Enum);
         }
 
         private void InputField(string pName, string pLabel) {
-            var temp = EditorGUILayout.TextField(pLabel, EditorPrefs.GetString(pName));
-            EditorPrefs.SetString(pName, temp);
+            var temp = EditorGUILayout.TextField(pLabel, EditorUserSettings.GetConfigValue(pName));
+            EditorUserSettings.SetConfigValue(pName, temp);
         }
         
         private void OnGUI() {
@@ -74,7 +74,7 @@ namespace CSVData {
             InputField("CSV_EnvPath", "env file path(local)");
             
             GUILayout.Space(50);
-            EditorPrefs.SetBool("CSV_AutoSave", GUILayout.Toggle(EditorPrefs.GetBool("CSV_AutoSave"), "Load data on play"));
+            EditorUserSettings.SetConfigValue("CSV_AutoSave", GUILayout.Toggle(EditorUserSettings.GetConfigValue("CSV_AutoSave") == "T", "Load data on play") ? "T" : "F");
             InputField("CSV_SavePath", "save data path(local)");
 
             _serializedObject.Update();
@@ -83,8 +83,7 @@ namespace CSVData {
             var isChanged = EditorGUI.EndChangeCheck();
             _serializedObject.ApplyModifiedProperties();
             if (isChanged)
-                EditorPrefs.SetString("CSV_TargetSheet", string.Join(',',_targetSheet));    
-            
+                EditorUserSettings.SetConfigValue("CSV_TargetSheet", string.Join(',',_targetSheet));    
             if (GUILayout.Button("Save"))
                 Load();
             if (GUILayout.Button("GenerateClass"))

@@ -22,7 +22,7 @@ namespace Extension.Test {
         private static Dictionary<Type, TestMethodInfo> _methods;
         private Vector2 _scroll; 
         
-        [MenuItem("Test/Window")]
+        [MenuItem("Window/Utilities/Test")]
         private static void Init() {
             var window = GetWindow<TestWindow>();
             window.Show();

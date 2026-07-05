@@ -19,7 +19,7 @@ namespace CSVData {
                 return;
             }
 
-            GenerateDataType(targetTypeName, datas, dataStyle);
+            GenerateDataType(targetTypeName, datas);
             Debug.Log($"complete {targetTypeName}Type making");
         }
 
@@ -46,7 +46,7 @@ namespace CSVData {
             return codeGenerator.ToString();
         }
 
-        private static void GenerateDataType(string targetTypeName, List<List<string>> datas, CSVDataStyle dataStyle) {
+        private static void GenerateDataType(string targetTypeName, List<List<string>> datas) {
 
             StringBuilder codeGenerator = new();
             codeGenerator.AppendLine("\t[GeneratedCode]");
@@ -72,19 +72,37 @@ namespace CSVData {
             GenerateFile(targetTypeName, result);
         }
         
-        private static void GenerateEnum(string targetTypeName, List<List<string>> datas) {
+        private static void GenerateEnum(string fileName, List<List<string>> datas) {
             StringBuilder codeGenerator = new();
 
-            codeGenerator.AppendLine($"enum {targetTypeName} {{");
-            foreach (var data in datas) {
-                
-                codeGenerator.AppendLine($"\t{data[0]},");
-            }
-            codeGenerator.AppendLine("};");
-            
-            var result = DefaultHeader() + codeGenerator.ToString();
+            foreach (var row in datas) {
+                var type = Type.GetType(row[0]);
+                if(type is { IsEnum: false })
+                    continue;
 
-            GenerateFile(targetTypeName, result);
+                bool isFlag = row[0].EndsWith("2x");
+                if (isFlag) codeGenerator.AppendLine("[Flags]");
+                codeGenerator.AppendLine($"enum {row[0]} {{");
+                var flagDefaultValue = "0b1";
+                
+                for (int i = 1; i < row.Count; i++) {
+                    var context = row[i];
+                    if (isFlag) {
+                        if (i == 1)
+                            context += " = 0b0";
+                        else {
+                            context += " = " + flagDefaultValue;
+                            flagDefaultValue += "0";
+                        }
+                    }
+                    codeGenerator.AppendLine($"\t{context},");
+                }
+                codeGenerator.AppendLine("};");
+            }
+            
+            var result = DefaultHeader() + codeGenerator;
+
+            GenerateFile(fileName, result);
         }
     }
 }

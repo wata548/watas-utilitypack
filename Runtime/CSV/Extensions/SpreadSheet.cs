@@ -4,7 +4,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 
 namespace CSVData.Extensions {
-    public static class SpreadSheet {
+    public static partial class SpreadSheet {
         
         public class SpreadSheetType {
 
@@ -18,7 +18,6 @@ namespace CSVData.Extensions {
             string src = $"https://sheets.googleapis.com/v4/spreadsheets/{path}/values/{sheet}?key={key}";
             var rawData = "";
             try {
-
                 rawData = httpClient.GetStringAsync(src).Result;
             }
             catch {

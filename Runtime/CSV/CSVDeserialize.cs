@@ -12,15 +12,15 @@ namespace CSVData {
         #region Object
 
         private static Object Deserialize(string typeName, List<string> headerNames, List<string> values,
-            bool ignoreSomeFieldError = true) =>
-            Deserialize(Type.GetType(typeName), headerNames, values, ignoreSomeFieldError);
+            bool ignoreException = true) =>
+            Deserialize(Type.GetType(typeName), headerNames, values, ignoreException);
         
-        private static Object Deserialize<T>(List<string> headerNames, List<string> values,
-            bool ignoreSomeFieldError = true) =>
-            Deserialize(typeof(T), headerNames, values, ignoreSomeFieldError);
+        private static T Deserialize<T>(List<string> headerNames, List<string> values,
+            bool ignoreException = true) =>
+            (T)Deserialize(typeof(T), headerNames, values, ignoreException);
         
         private static Object Deserialize(Type targetType, List<string> headerNames, List<string> values,
-            bool ignoreSomeFieldError = true) {
+            bool ignoreException = true) {
 
             var defaultReflectionFlag = BindingFlags.Instance 
                                         | BindingFlags.NonPublic
@@ -40,9 +40,9 @@ namespace CSVData {
                         targetType.GetProperty(headerNames[i], defaultReflectionFlag);
 
                     if (propertyInfo == null || !propertyInfo.CanWrite) {
+                        if (!ignoreException)
+                            throw new MissingFieldException($"{headerNames[i]} isn't exist or can't write. ({propertyInfo})");
                         Debug.LogError($"{headerNames[i]} isn't exist or can't write. ({propertyInfo})");
-                        if (!ignoreSomeFieldError)
-                            throw new MissingFieldException($"This '{headerNames[i]}' isn't exist on {result}Type");
                         continue;        
                     }
 
@@ -69,38 +69,61 @@ namespace CSVData {
         #endregion
 
         #region List
-
-        public static Object DeserializeToList(string typeName, string data, bool ignoreSomeError = true) =>
-            DeserializeToList(Type.GetType(typeName), Parse(data), ignoreSomeError);
-
-        public static Object DeserializeToList<T>(string data, bool ignoreSomeError = true) =>
-            DeserializeToList(typeof(T), Parse(data), ignoreSomeError);
-
-        public static Object DeserializeToList(Type type, string data, bool ignoreSomeError = true) =>
-            DeserializeToList(type, Parse(data), ignoreSomeError);
         
-        public static Object DeserializeToList(string typeName, List<string> data, bool ignoreSomeError = true) =>
-            DeserializeToList(Type.GetType(typeName), Parse(data), ignoreSomeError);
+        //string base
+        public static List<T> DeserializeToList<T>(string data, bool ignoreException = true) =>
+            DeserializeToList<T>(Parse(data), ignoreException);
 
-        public static Object DeserializeToList<T>(List<string> data, bool ignoreSomeError = true) =>
-            DeserializeToList(typeof(T), Parse(data), ignoreSomeError);
-
-        public static Object DeserializeToList(Type type, List<string> data, bool ignoreSomeError = true) =>
-            DeserializeToList(type, Parse(data), ignoreSomeError);
+        public static Object DeserializeToList(string typeName, string data, bool ignoreException = true) =>
+            DeserializeToList(Type.GetType(typeName), Parse(data), ignoreException);
         
-        public static Object DeserializeToList(string typeName, List<List<string>> datas, bool ignoreSomeError = true) =>
-            DeserializeToList(Type.GetType(typeName), datas, ignoreSomeError);
-
-        public static Object DeserializeToList<T>(List<List<string>> datas, bool ignoreSomeError = true) =>
-            DeserializeToList(typeof(T), datas, ignoreSomeError);
+        public static Object DeserializeToList(Type type, string data, bool ignoreException = true) =>
+            DeserializeToList(type, Parse(data), ignoreException);
         
-        public static Object DeserializeToList(Type targetType, List<List<string>> datas, bool ignoreSomeError = true) {
+        //string list base
+        public static List<T> DeserializeToList<T>(List<string> data, bool ignoreException = true) =>
+            DeserializeToList<T>(Parse(data), ignoreException);
+        
+        public static Object DeserializeToList(string typeName, List<string> data, bool ignoreException = true) =>
+            DeserializeToList(Type.GetType(typeName), Parse(data), ignoreException);
+
+        public static Object DeserializeToList(Type type, List<string> data, bool ignoreException = true) =>
+            DeserializeToList(type, Parse(data), ignoreException);
+        
+        //string 2d list base
+        public static List<T> DeserializeToList<T>(List<List<string>> datas, bool ignoreException = true) {
+                    
+                    if (datas.Count <= 2) {
+        
+                        if (!ignoreException)
+                            throw new Exception("data should big than 2 row(headerName, headerType)");
+                        Debug.LogError("data should big than 2 row(headerName, headerType)");
+                        return null;
+                    }
+                    
+                    var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
+        
+                    var list = new List<T>();
+                    for (int i = 2; i < datas.Count; i++) {
+                        if (datas[i].All(string.IsNullOrWhiteSpace))
+                            break;
+                        var row = Deserialize<T>(headerNames, datas[i], ignoreException);
+                        list.Add(row);
+                    }
+        
+                    return list;
+                }
+
+        public static Object DeserializeToList(string typeName, List<List<string>> datas, bool ignoreException = true) =>
+            DeserializeToList(Type.GetType(typeName), datas, ignoreException);
+        
+        public static Object DeserializeToList(Type targetType, List<List<string>> datas, bool ignoreException = true) {
 
             if (datas.Count <= 2) {
 
-                if (!ignoreSomeError)
+                if (!ignoreException)
                     throw new Exception("data should big than 2 row(headerName, headerType)");
-                
+                Debug.LogError("data should big than 2 row(headerName, headerType)");
                 return null;
             }
             
@@ -112,21 +135,14 @@ namespace CSVData {
             var addFunction = listType.GetMethod("Add", new Type[] { targetType })!;
             
             for (int i = 2; i < datas.Count; i++) {
-                if (datas[i].All(cell => string.IsNullOrWhiteSpace(cell)))
+                if (datas[i].All(string.IsNullOrWhiteSpace))
                     break;
-                var row = Deserialize(targetType, headerNames, datas[i], ignoreSomeError);
+                var row = Deserialize(targetType, headerNames, datas[i], ignoreException);
                 addFunction.Invoke(list, new[] {row});
             }
 
             return list;
         }
-        
-        public static Object DeserializeToListBySpreadSheet(Type targetType, string path, string sheet, string key,
-            bool ignoreSomeError = true) {
-            var data = SpreadSheet.LoadData(path, sheet, key);
-            return DeserializeToList(targetType, data, ignoreSomeError);
-        }
-
         #endregion
 
         #region Dictionary
@@ -136,77 +152,87 @@ namespace CSVData {
             out Type keyType, bool ignoreSomeError  = true) =>
             DeserializeToDictionary(Type.GetType(typeName), Parse(data), primaryKey, out keyType, ignoreSomeError);
         
-        public static Object DeserializeToDictionary<T>(string data, string primaryKey, 
-            out Type keyType, bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(typeof(T), Parse(data), primaryKey, out keyType, ignoreSomeError);
-        
         public static Object DeserializeToDictionary(Type type, string data, string primaryKey, 
             out Type keyType, bool ignoreSomeError  = true) =>
             DeserializeToDictionary(type, Parse(data), primaryKey, out keyType, ignoreSomeError);
         
-        //string input and ignore out keyType
-        public static Object DeserializeToDictionary(string typeName, string data, string primaryKey, 
+        public static Dictionary<TKey, TValue> DeserializeToDictionary<TKey, TValue>(string data, string primaryKey, 
             bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(Type.GetType(typeName), Parse(data), primaryKey, out var keyType, ignoreSomeError);
+            DeserializeToDictionary<TKey, TValue>(Parse(data), primaryKey, ignoreSomeError);
         
-        public static Object DeserializeToDictionary<T>(string data, string primaryKey, 
-            bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(typeof(T), Parse(data), primaryKey, out var keyType, ignoreSomeError);
-        
-        public static Object DeserializeToDictionary(Type type, string data, string primaryKey, 
-            bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(type, Parse(data), primaryKey, out var keyType, ignoreSomeError);
-        
-        //1dimension input
+        //1dimension
         public static Object DeserializeToDictionary(string typeName, List<string> data, string primaryKey, 
             out Type keyType, bool ignoreSomeError  = true) =>
             DeserializeToDictionary(Type.GetType(typeName), Parse(data), primaryKey, out keyType, ignoreSomeError);
         
-        public static Dictionary<Object, T> DeserializeToDictionary<T>(List<string> data, string primaryKey, 
-            out Type keyType, bool ignoreSomeError  = true) =>
-            (Dictionary<Object, T>)DeserializeToDictionary(typeof(T), Parse(data), primaryKey, out keyType, ignoreSomeError);
         
         public static Object DeserializeToDictionary(Type type, List<string> data, string primaryKey, 
             out Type keyType, bool ignoreSomeError  = true) =>
             DeserializeToDictionary(type, Parse(data), primaryKey, out keyType, ignoreSomeError);
         
-        //1dimension and ignore out keyType
-        public static Object DeserializeToDictionary(string typeName, List<string> data, string primaryKey, 
+        public static Dictionary<TKey, TValue> DeserializeToDictionary<TKey, TValue>(List<string> data, string primaryKey, 
             bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(Type.GetType(typeName), Parse(data), primaryKey, out var keyType, ignoreSomeError);
+            DeserializeToDictionary<TKey, TValue>(Parse(data), primaryKey, ignoreSomeError);
         
-        public static Dictionary<Object, T> DeserializeToDictionary<T>(List<string> data, string primaryKey, 
-            bool ignoreSomeError  = true) =>
-            (Dictionary<Object, T>)DeserializeToDictionary(typeof(T), Parse(data), primaryKey, out var keyType, ignoreSomeError);
-        
-        public static Object DeserializeToDictionary(Type type, List<string> data, string primaryKey, 
-            bool ignoreSomeError  = true) =>
-            DeserializeToDictionary(type, Parse(data), primaryKey, out var keyType, ignoreSomeError);
-        
-        //2dimension list Type ignore key Type
-        
-        public static Object DeserializeToDictionary(string typeName, List<List<string>> datas, string primaryKeyName,
-            bool ignoreSomeError = true) =>
-            DeserializeToDictionary(Type.GetType(typeName), datas, primaryKeyName, out var keyType, ignoreSomeError);
-
-        public static Object DeserializeToDictionary<T>(List<List<string>> datas, string primaryKeyName,
-            bool ignoreSomeError = true) =>
-            DeserializeToDictionary(typeof(T), datas, primaryKeyName, out var keyType, ignoreSomeError);
-        public static Object DeserializeToDictionary(Type type, List<List<string>> datas, string primaryKeyName,
-            bool ignoreSomeError = true) =>
-            DeserializeToDictionary(type, datas, primaryKeyName, out var keyType, ignoreSomeError);
-        
-        //2dimension list Type
+        //2dimension
         public static Object DeserializeToDictionary(string typeName, List<List<string>> datas, string primaryKeyName,
             out Type keyType, bool ignoreSomeError = true) =>
             DeserializeToDictionary(Type.GetType(typeName), datas, primaryKeyName, out keyType, ignoreSomeError);
 
-        public static Dictionary<Object, T> DeserializeToDictionary<T>(List<List<string>> datas, string primaryKeyName,
-            out Type keyType, bool ignoreSomeError = true) {
+        public static Dictionary<TKey, TValue> DeserializeToDictionary<TKey, TValue>(List<List<string>> datas, string primaryKeyName, bool ignoreSomeError = true) {
+            if (datas.Count <= 2) {
 
-            var output = DeserializeToDictionary(typeof(T), datas, primaryKeyName, out keyType, ignoreSomeError);
-            return (Dictionary<Object, T>)output;
+                if (!ignoreSomeError)
+                    throw new Exception("data should big than 2 row(headerName, headerType)");
+                Debug.LogError("data should big than 2 row(headerName, headerType)");
 
+                return null;
+            }
+
+            var targetType = typeof(TKey);
+            MemberInfo primaryKeyInfo = targetType.GetField(primaryKeyName);
+            if (primaryKeyInfo == null) {
+
+                primaryKeyInfo = targetType.GetProperty(primaryKeyName);
+                if (primaryKeyInfo == null) {
+                    if (!ignoreSomeError)
+                        throw new Exception($"This key is wrong '{primaryKeyName}'isn't exist");
+                    Debug.LogError($"This key is wrong '{primaryKeyName}'isn't exist");
+                    return null;
+                }
+
+                if (typeof(TKey) != (primaryKeyInfo as PropertyInfo)!.PropertyType) {
+                    if (!ignoreSomeError)
+                        throw new Exception($"Key type didn't match({(primaryKeyInfo as PropertyInfo)!.PropertyType})");
+                    Debug.LogError($"Key type didn't match({(primaryKeyInfo as PropertyInfo)!.PropertyType})");
+                }
+            }
+            else {
+                if (typeof(TKey) != (primaryKeyInfo as FieldInfo)!.FieldType) {
+                    if (!ignoreSomeError)
+                        throw new Exception($"Key type didn't match({(primaryKeyInfo as FieldInfo)!.FieldType})");
+                    Debug.LogError($"Key type didn't match({(primaryKeyInfo as FieldInfo)!.FieldType})");
+                }
+            }
+            
+            var headerNames = datas[0].Where(header => !string.IsNullOrWhiteSpace(header)).ToList();
+            var result = new Dictionary<TKey, TValue>();
+
+            Dictionary<int, int> a = new();
+
+            for (int i = 2; i < datas.Count; i++) {
+                var newValue = Deserialize<TValue>(headerNames, datas[i], ignoreSomeError);
+
+                TKey newKey = default;
+                if (primaryKeyInfo is FieldInfo fieldKey)
+                    newKey = (TKey)fieldKey.GetValue(newValue)!;
+                else if (primaryKeyInfo is PropertyInfo propertyKey)
+                    newKey = (TKey)propertyKey.GetValue(newValue)!;
+                
+                result.Add(newKey, newValue);
+            }
+
+            return result;
         }
         
         public static Object DeserializeToDictionary(Type targetType, List<List<string>> datas, string primaryKeyName,
@@ -215,6 +241,7 @@ namespace CSVData {
 
                 if (!ignoreSomeError)
                     throw new Exception("data should big than 2 row(headerName, headerType)");
+                Debug.LogError("data should big than 2 row(headerName, headerType)");
 
                 keyType = null;
                 return null;
@@ -227,6 +254,7 @@ namespace CSVData {
                 if (primaryKeyInfo == null) {
                     if (!ignoreSomeError)
                         throw new Exception($"This key is wrong '{primaryKeyName}'isn't exist");
+                    Debug.LogError($"This key is wrong '{primaryKeyName}'isn't exist");
                     keyType = null;
                     return null;
                 }
@@ -261,12 +289,6 @@ namespace CSVData {
             }
 
             return result;
-        }
-
-        public static Object DeserializeToDictionaryBySpreadSheet(Type targetType, string path, string sheet, string key,
-            out Type keyType, string primaryKey = "SerialNumber", bool ignoreSomeError = true) {
-            var data = SpreadSheet.LoadData(path, sheet, key);
-            return DeserializeToDictionary(targetType, data, primaryKey, out keyType, ignoreSomeError);
         }
         #endregion
     }

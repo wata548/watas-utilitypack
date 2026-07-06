@@ -31,7 +31,7 @@ csv데이터를 받아 형식에 맞춰 대상의 타입으로 파싱합니다.<
 
 1) 데이터 명
 2) 데이터 타입 (기본 타입의 경우 System내에 있는 걸로 표기해야합니다. 
- ex: <span style="color:Tomato">int</span> <span style="color:lime">Int32</span>, <span style="color:Tomato">bool</span> <span style="color:lime">Boolean</span> 등, </br>
+ ex: <span style="color:Tomato">int X</span> <span style="color:lime">Int32 O</span>, <span style="color:Tomato">bool X</span> <span style="color:lime">Boolean O</span> 등, </br>
  또한 직접 만든 `class`, `Enum`의 경우 `Namespace`까지 포함해서 작성해야합니다.)
 3) 데이터들
 

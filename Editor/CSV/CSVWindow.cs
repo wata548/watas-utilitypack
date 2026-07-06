@@ -91,7 +91,7 @@ namespace CSVData {
             
             GUILayout.Space(50);
             InputField("CSV_TypeSheet", "TypeSheet");
-            if (GUILayout.Button("GenerateCSV"))
+            if (GUILayout.Button("GenerateEnum"))
                 GenerateEnum();
         }
     }

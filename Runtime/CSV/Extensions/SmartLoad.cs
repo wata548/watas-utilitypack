@@ -12,7 +12,7 @@ namespace CSVData.Extensions {
         /// <param name="pSheet">FileName / Spread sheet's sheet name</param>
         /// <param name="pDirectory">directory path(Resources/{pDirectory})</param>
         public static List<T> SmartLoad<T>(string pSheet, string pDirectory = "") {
-            return CSV.DeserializeToList<T>(SmartLoad(pSheet, pDirectory);
+            return CSV.DeserializeToList<T>(SmartLoad(pSheet, pDirectory));
         }
         /// <summary>
         /// <p> It depends on csv window's parameter(in editor not runtime)</p>
@@ -43,6 +43,5 @@ namespace CSVData.Extensions {
             return context;
 
         }
-    }
     }
 }

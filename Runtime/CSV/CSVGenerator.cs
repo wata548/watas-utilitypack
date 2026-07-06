@@ -77,6 +77,7 @@ namespace CSVData {
 
             foreach (var row in datas) {
                 var type = Type.GetType(row[0]);
+                if(type == null) type = Type.GetType($"System.{row[0]}");
                 if(type is { IsEnum: false })
                     continue;
 

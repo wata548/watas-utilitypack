@@ -37,7 +37,7 @@ namespace CSVData.Extensions {
             }
 #endif
             if (!isAutoSave) {
-                var resource = Resources.Load<TextAsset>(Path.Join(pDirectory, pSheet + ".csv"));
+                var resource = Resources.Load<TextAsset>(Path.Join(pDirectory, pSheet));
                 context = CSV.Parse(resource.text);    
             }
             return context;

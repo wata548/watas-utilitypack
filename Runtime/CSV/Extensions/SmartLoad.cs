@@ -25,12 +25,12 @@ namespace CSVData.Extensions {
             bool isAutoSave = false;
             var context = new List<List<string>>();
 #if UNITY_EDITOR
-            if (UnityEditor.EditorPrefs.GetBool("CSV_AutoSave")) {
+            if (UnityEditor.EditorUserSettings.GetConfigValue("CSV_AutoSave") == "T") {
                 isAutoSave = true;
-                var envPath = Path.Combine(Application.dataPath, UnityEditor.EditorPrefs.GetString("CSV_EnvPath"));
+                var envPath = Path.Combine(Application.dataPath, UnityEditor.EditorUserSettings.GetConfigValue("CSV_EnvPath"));
                 var ssKey = File.ReadAllText(envPath);
-                var ssPath = UnityEditor.EditorPrefs.GetString("CSV_SheetId");
-                var savePath = Path.Combine(Application.dataPath, UnityEditor.EditorPrefs.GetString("CSV_SavePath"));
+                var ssPath = UnityEditor.EditorUserSettings.GetConfigValue("CSV_SheetId");
+                var savePath = Path.Combine(Application.dataPath, UnityEditor.EditorUserSettings.GetConfigValue("CSV_SavePath"));
                 context = LoadData(ssPath, pSheet, ssKey);
                 var data = CSV.Serialize(context);
                 File.WriteAllText(Path.Join(savePath, $"{pSheet}.csv"), data);

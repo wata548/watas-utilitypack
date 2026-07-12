@@ -34,6 +34,10 @@ namespace CSVData {
                 var fieldInfo = 
                     targetType.GetField(headerNames[i], defaultReflectionFlag);
                 
+                var cellValue = values.Count > i
+                    ? values[i]
+                    : "";
+                
                 if (fieldInfo == null) {
 
                     var propertyInfo = 
@@ -47,7 +51,7 @@ namespace CSVData {
                     }
 
                     var propertyType = propertyInfo.PropertyType;
-                    var propertyData = CSharpExtension.Parse(propertyType, values[i]);
+                    var propertyData = CSharpExtension.Parse(propertyType, cellValue);
                     
                     propertyInfo.SetValue(result, propertyData);
                 }
@@ -55,7 +59,7 @@ namespace CSVData {
                 else {
                     
                     var fieldType = fieldInfo.FieldType;
-                    var fieldData = CSharpExtension.Parse(fieldType, values[i]);
+                    var fieldData = CSharpExtension.Parse(fieldType, cellValue);
                     fieldInfo.SetValue(result, fieldData);
                 }
             }
